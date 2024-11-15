@@ -85,10 +85,15 @@ Backend: The Express server handles API requests and connects to MongoDB using M
 Database: MongoDB stores the contact information with Mongoose schemas defining data structure and validation rules.
 
 Challenges and Solutions
+
+First It was challenging for me to use Material UI than with the help of resources present on Internet I found the solution.
+
+Initially I have made email as required in my contactSchema but which should not be required also as we can save someone's contact without email also so for removing the required function we can not do only by removing the code (required : true) infact we have to write a code in mongoDB shell to remove this functionality as we have to delete the index which was created already the code is used to solve this problem is "db.contacts.dropIndex("email_1")"
+
+While submitting the contact details sometimes runtime error arises for which I have add a functionality in the mongoDB connection code that is "serverSelectionTimeoutMS: 5000"
+
 State Management in React: Managing edit mode and form state was essential for a smooth user experience. I solved this by using React’s useState and passing state as props between components.
 API Integration: Implementing asynchronous functions with Axios to handle API calls for CRUD operations. Error handling was added to manage API failures gracefully.
 Database Validation: To ensure data integrity, required fields were set in the Mongoose schema, and unique constraints were used for phone number.
 
-Future Improvements
-Search and Filter Functionality: Adding a search bar and filtering options to make it easier to locate specific contacts.
-User Authentication: Enhancing the security of the app by adding login and access control to protect the contact information.
+

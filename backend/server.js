@@ -12,11 +12,10 @@ app.use(cors());
 const contactRoutes = require('./routes/ContactRoutes');
 app.use('/contacts', contactRoutes);
 
-
-
 mongoose.connect(process.env.DB_URI, { 
     // useNewUrlParser: true, 
     //  useUnifiedTopology: true 
+    serverSelectionTimeoutMS: 5000
  })
     .then(() => console.log("MongoDB connected"))
     .catch(err => console.error(err));

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, Grid2, Typography } from '@mui/material';
+import { TextField, Button, Grid, Typography, Alert } from '@mui/material';
 import { createContact, updateContact } from '../api';
 
 function ContactForm({ fetchContacts, editContact, clearEditContact }) {
@@ -12,6 +12,8 @@ function ContactForm({ fetchContacts, editContact, clearEditContact }) {
         jobTitle: ''
     });
 
+    const [error, setError] = useState('');  // To store the error message
+
     useEffect(() => {
         if (editContact) setContact(editContact);
     }, [editContact]);
@@ -20,21 +22,31 @@ function ContactForm({ fetchContacts, editContact, clearEditContact }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (editContact) {
-            await updateContact(editContact._id, contact);
-        } else {
-            await createContact(contact);
+        setError('');  // Clear any previous error message
+
+        try {
+            if (editContact) {
+                await updateContact(editContact._id, contact); // Update existing contact
+            } else {
+                await createContact(contact); // Create a new contact
+            }
+            fetchContacts();
+            clearEditContact();
+            setContact({
+                firstName: '',
+                lastName: '',
+                email: '',
+                phoneNumber: '',
+                company: '',
+                jobTitle: ''
+            });
+        } catch (err) {
+            if (err.response && err.response.status === 409) {
+                setError(err.response.data.error);  // Display specific error message from backend
+            } else {
+                setError('An error occurred. Please try again later.');
+            }
         }
-        fetchContacts();
-        setContact({
-            firstName: '',
-            lastName: '',
-            email: '',
-            phoneNumber: '',
-            company: '',
-            jobTitle: ''
-        });
-        clearEditContact();
     };
 
     return (
@@ -42,31 +54,32 @@ function ContactForm({ fetchContacts, editContact, clearEditContact }) {
             <Typography variant="h6" gutterBottom>
                 {editContact ? 'Update Contact' : 'Add New Contact'}
             </Typography>
-            <Grid2 container spacing={2}>
-                <Grid2 item xs={12} sm={6}>
+            {error && <Alert severity="error" style={{ marginBottom: '1rem' }}>{error}</Alert>}
+            <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
                     <TextField label="First Name" name="firstName" value={contact.firstName} onChange={handleChange} fullWidth required />
-                </Grid2>
-                <Grid2 item xs={12} sm={6}>
+                </Grid>
+                <Grid item xs={12} sm={6}>
                     <TextField label="Last Name" name="lastName" value={contact.lastName} onChange={handleChange} fullWidth  />
-                </Grid2>
-                <Grid2 item xs={12}>
-                    <TextField label="Email" name="email" value={contact.email} onChange={handleChange} fullWidth required />
-                </Grid2>
-                <Grid2 item xs={12}>
+                </Grid>
+                <Grid item xs={12}>
+                    <TextField label="Email" name="email" value={contact.email} onChange={handleChange} fullWidth  />
+                </Grid>
+                <Grid item xs={12}>
                     <TextField label="Phone Number" name="phoneNumber" value={contact.phoneNumber} onChange={handleChange} fullWidth required />
-                </Grid2>
-                <Grid2 item xs={12}>
+                </Grid>
+                <Grid item xs={12}>
                     <TextField label="Company" name="company" value={contact.company} onChange={handleChange} fullWidth  />
-                </Grid2>
-                <Grid2 item xs={12}>
+                </Grid>
+                <Grid item xs={12}>
                     <TextField label="Job Title" name="jobTitle" value={contact.jobTitle} onChange={handleChange} fullWidth  />
-                </Grid2>
-                <Grid2 item xs={12}>
+                </Grid>
+                <Grid item xs={12}>
                     <Button type="submit" variant="contained" color="primary" fullWidth>
                         {editContact ? 'Update Contact' : 'Add Contact'}
                     </Button>
-                </Grid2>
-            </Grid2>
+                </Grid>
+            </Grid>
         </form>
     );
 }
